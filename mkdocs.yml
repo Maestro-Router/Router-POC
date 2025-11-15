@@ -1,5 +1,0 @@
-site_name: a-python-project-template
-nav:
-  - Home: index.md
-theme:
-  name: material
