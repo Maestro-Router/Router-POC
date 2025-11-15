@@ -1,9 +1,13 @@
 import time
 import gradio as gr
 
+from execute_backend import mock_llm
+
 def send(message, history):
     # will call send function from back
-    return f"Vous avez envoyé: {message}" 
+    response = mock_llm(message)
+    #return f"Vous avez envoyé: {message} which should return: {response}" 
+    return response["response"]
 
 def echo_multimodal(message, history):
     response = []
@@ -17,7 +21,7 @@ def echo_history(message, history):
     return f"Vous avez message {message} + \n historique: {history}" 
 
 demo = gr.ChatInterface(
-    fn=echo_history,
+    fn=send,
     title="Maestro AI",
     type="messages",
     flagging_mode="manual",
