@@ -10,10 +10,6 @@ total_co2_grams = 0.0   # Grams of CO2
 # Store feedback for each message
 feedback_log = {}
 
-# Store currently attached files
-attached_files = []
-files_just_attached = False
-
 def calculate_energy_impact(message, response):
     """
     Calculate realistic energy consumption and CO2 emissions for an LLM query.
@@ -112,24 +108,19 @@ with gr.Blocks(theme="ocean", css="""
     """)
     
     def respond(message, chat_history, files):
-        global total_watt_hours, total_co2_grams, attached_files, files_just_attached
-        
-        # Update attached files list if new files provided
-        if files:
-            attached_files = files if isinstance(files, list) else [files]
-            files_just_attached = True
+        global total_watt_hours, total_co2_grams
         
         if not message.strip():
-            return "", chat_history, f"⚡ Energy: {total_watt_hours:.3f} Wh", f"🌍 CO2: {total_co2_grams:.3f} g", gr.update(visible=False), ""
+            return "", chat_history, f"⚡ Energy: {total_watt_hours:.3f} Wh", f"🌍 CO2: {total_co2_grams:.3f} g", None, gr.update(visible=False), ""
         
         # Build the full message with file information
         full_message = message
         user_display_message = message
         
-        # Only show file info in display message if files were JUST attached
-        if attached_files and files_just_attached:
+        # Only process files if they exist
+        if files:
             file_info = "\n\n📎 Attached files:\n"
-            for file in attached_files:
+            for file in files:
                 if hasattr(file, 'name'):
                     file_path = file.name if hasattr(file, 'name') else str(file)
                     file_info += f"- {file_path}\n"
@@ -137,16 +128,8 @@ with gr.Blocks(theme="ocean", css="""
                 else:
                     file_info += f"- {str(file)}\n"
                     print(f"📎 Attachment location: {str(file)}")
+            full_message += file_info
             user_display_message += file_info
-            files_just_attached = False  # Reset flag after showing once
-        
-        # Always include attached files in the full message to backend
-        if attached_files:
-            backend_file_info = "\n\n📎 Context - Attached files:\n"
-            for file in attached_files:
-                file_path = file.name if hasattr(file, 'name') else str(file)
-                backend_file_info += f"- {file_path}\n"
-            full_message += backend_file_info
         
         # Get response
         response = mock_llm(full_message)
@@ -167,8 +150,8 @@ with gr.Blocks(theme="ocean", css="""
         watt_text = f"⚡ Energy: {total_watt_hours:.3f} Wh"
         co2_text = f"🌍 CO2: {total_co2_grams:.3f} g"
         
-        # Clear the message input, update chat, update counters
-        return "", chat_history, watt_text, co2_text, gr.update(visible=False), ""
+        # Clear the message input, update chat, update counters, and clear files
+        return "", chat_history, watt_text, co2_text, None, gr.update(visible=False), ""
     
     def handle_like_event(data: gr.LikeData):
         """Handle like/dislike - show feedback in a display"""
@@ -192,30 +175,28 @@ with gr.Blocks(theme="ocean", css="""
         return gr.update(visible=True, value=feedback_text)
     
     def reset_counters():
-        global total_watt_hours, total_co2_grams, feedback_log, attached_files, files_just_attached
+        global total_watt_hours, total_co2_grams, feedback_log
         total_watt_hours = 0.0
         total_co2_grams = 0.0
         feedback_log = {}
-        attached_files = []
-        files_just_attached = False
-        return [], "⚡ Energy: 0.000 Wh", "🌍 CO2: 0.000 g", gr.update(visible=False), ""
+        return [], "⚡ Energy: 0.000 Wh", "🌍 CO2: 0.000 g", None, gr.update(visible=False), ""
     
     # Event handlers
     submit.click(
         respond,
         inputs=[msg, chatbot, file_upload],
-        outputs=[msg, chatbot, watt_display, co2_display, feedback_display, feedback_display]
+        outputs=[msg, chatbot, watt_display, co2_display, file_upload, feedback_display, feedback_display]
     )
     
     msg.submit(
         respond,
         inputs=[msg, chatbot, file_upload],
-        outputs=[msg, chatbot, watt_display, co2_display, feedback_display, feedback_display]
+        outputs=[msg, chatbot, watt_display, co2_display, file_upload, feedback_display, feedback_display]
     )
     
     clear.click(
         reset_counters, 
-        outputs=[chatbot, watt_display, co2_display, feedback_display, feedback_display]
+        outputs=[chatbot, watt_display, co2_display, file_upload, feedback_display, feedback_display]
     )
     
     # Like/Dislike handler - show feedback in display
