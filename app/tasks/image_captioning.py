@@ -60,7 +60,7 @@ def _open_image(source: str | Path | Image.Image) -> Image.Image:
 def _resolver(
     query: str
  ) -> dict[str, Any]:
-    img = _open_image("/Users/damien/git/hackathon/resouces/image copy.png")
+    img = _open_image("/home/onyxia/work/Router-POC/resouces/image copy.png")
     pixel_values = image_processor(img, return_tensors="pt").pixel_values
     generated_ids = model.generate(
         pixel_values,
@@ -82,6 +82,7 @@ task = Task(
         "Utile pour l'accessibilité, la modération de contenu et la génération de métadonnées. "
         "Entrée : image unique ou objet PIL Image ; "
         "Sortie : une courte légende descriptive."
+        "Exemple : Légende-moi cette image !"
     ),
     resolver=_resolver,
 )

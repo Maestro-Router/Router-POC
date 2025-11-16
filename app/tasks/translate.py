@@ -34,9 +34,6 @@ _tokenizer = None
 
 
 def _load_nllb():
-    """
-    Lazy loading : évite de charger 3 Go de modèle au démarrage.
-    """
     global _model, _tokenizer
 
     if _model is None:

@@ -7,7 +7,7 @@ from app.tasks.base import Task
 reader = easyocr.Reader(['en'])
 
 def _resolver(query: str) -> str:
-    img = cv2.imread("/Users/damien/git/hackathon/resouces/image.png")
+    img = cv2.imread("/home/onyxia/work/Router-POC/resouces/image.png")
     results = reader.readtext(img)
     extracted_texts = [res[1] for res in results]
     return "\n".join(extracted_texts)

@@ -50,9 +50,16 @@ class Maestro:
         """Return the TaskSpec that best matches the query or None if below threshold."""
         query_vec = self.encoder.encode([query], normalize_embeddings=True)
         scores = (query_vec @ self.task_embeddings.T)[0]
+
+        for task, score in zip(self.tasks, scores):
+            logger.info(f"Tâche : {task.name} | Score : {score:.2f}")
+
         best_idx = int(np.argmax(scores))
         best_score = float(scores[best_idx])
         best_task = self.tasks[best_idx]
+
+
+
         logger.info("Query routed to task: %s (score %.3f)", best_task.name, best_score)
         if best_score < self.threshold:
             logger.info("No task above threshold %.3f; using fallback", self.threshold)

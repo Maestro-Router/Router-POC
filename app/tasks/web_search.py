@@ -6,7 +6,7 @@ from app.tasks.base import Task
 def _resolver(query: str) -> str:
     try:
         ddgs = DDGS()
-        results = ddgs.text(query["text"], max_results=5)
+        results = ddgs.text(query, max_results=5)
 
         if not results:
             return "Pas de résultats trouvés pour la requête."
@@ -38,7 +38,8 @@ task = Task(
         "Entrée : question ou demande d'information de l'utilisateur ; "
         "Sortie : liste classée d'extraits courts avec URL source. "
         "Cas particuliers : requêtes ambiguës, demandes de données personnelles ou contenus payants. "
-        "Le résolveur doit privilégier les domaines de qualité et inclure le contexte des extraits lorsque possible."
+        "Le résolveur doit privilégier les domaines de qualité et inclure le contexte des extraits lorsque possible. "
+        "Exemple : Donne-moi la biographie de Victor Hugo"
     ),
     resolver=_resolver,
 )
