@@ -1,10 +1,18 @@
 from app.tasks.base import Task
+import easyocr
+import numpy as np
+from PIL import Image
+import io
+import cv2
 
+
+reader = easyocr.Reader(['en'])
 
 def _resolver(query: str) -> str:
-    # Simulated OCR extraction from an image
-    return "Price: $19.99\nItem: Wireless Mouse\nQuantity: 2\nTotal: $39.98"
-
+    img = cv2.imread("/Users/damien/git/hackathon/resouces/image.png")
+    results = reader.readtext(img)
+    extracted_texts = [res[1] for res in results]
+    return "\n".join(extracted_texts)
 
 task = Task(
     name="OCR",

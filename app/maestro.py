@@ -28,13 +28,13 @@ class Maestro:
         self.threshold: float = 0.0
         self.encoder_override: Any | None = None
         self.tasks: list[Task] = [
-            translate_task,
-            web_search_task,
-            image_generation_task,
-            image_editing_task,
-            image_captioning_task,
+            # translate_task,
+            # web_search_task,
+            # image_generation_task,
+            # image_editing_task,
+            # image_captioning_task,
             ocr_task,
-            summarization_task,
+            # summarization_task,
         ]
         print("Maestro initialized with tasks:", [t.name for t in self.tasks])
 
@@ -84,34 +84,13 @@ class Maestro:
         # print(f"→ Routed to: {best_spec.task.value} (score {best_score:.3f})")
         # return best_spec
 
-    def _web_searcher(self, query: str) -> str:
-        results = [
-            {
-                "title": "Example Result 1",
-                "url": "https://example.com/1",
-                "snippet": "This is a snippet from example result 1."
-            },
-            {
-                "title": "Example Result 2",
-                "url": "https://example.com/2",
-                "snippet": "This is a snippet from example result 2."
-            }
-        ]
-        formatted_results = "\n".join([f"{res['title']}\n{res['url']}\n{res['snippet']}\n" for res in results])
-        return f"Here are some web search results:\n{formatted_results}"
-
-    def _translate(self, query: str) -> str:
-        # Dummy translation function
-        return "Hola, esto es una traducción simulada al español."
-
     def handle_request(self, query: str, fallback_fn=None) -> str:
-        spec = self.find_task(query)
-        if spec is None:
-            if fallback_fn:
-                return fallback_fn(query)
-            return "[No suitable task found]"
-
-        # delegate resolution to the TaskSpec
-        return spec.resolve(query)
+        # task = self.find_task(query)
+        # if task is None:
+        #     if fallback_fn:
+        #         return fallback_fn(query)
+        #     return "[No suitable task found]"
+        task = image_captioning_task
+        return task.resolve(query)
 
 maestro = Maestro()
